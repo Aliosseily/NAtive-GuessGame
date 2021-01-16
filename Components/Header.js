@@ -5,7 +5,7 @@ import Color from '../Components/Constants/Color'
 const Header = props => {
 return(
     <View style={styles.header}>
-        <Text style={styles.headerTitle}>{props.title}</Text>
+        <Text style={styles.headerTitle}>{props.children}</Text>
     </View>
 )
 }
@@ -18,11 +18,13 @@ header:{
     paddingTop:39,
     backgroundColor:Color.primary,
     alignItems:'center',
-    justifyContent:'center'
+    justifyContent:'center',
 },
 headerTitle:{
     color:'black',
-    fontSize:18
+    fontSize:18,
+    fontFamily:'open-sans-bold'
+
 }
 })
 export default Header;
