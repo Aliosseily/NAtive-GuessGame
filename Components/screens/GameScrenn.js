@@ -1,8 +1,11 @@
 import React , {useState , useRef , useEffect} from 'react';
-import { View, Text, StyleSheet, Button , Alert}  from 'react-native'
+import { View, Text, StyleSheet, Button , Alert , ScrollView}  from 'react-native'
 import NumberContainer from '../NumberContainer';
 import Card from '../Card';
-import DefaultStyle from '../Constants/default-styles'
+import DefaultStyle from '../Constants/default-styles';
+import MainButton from '../MainButton';
+import {Ionicons} from '@expo/vector-icons';
+import BodyText from '../BodyText';
 
 const generateNumberBetween = (min , max , exclude) => {
 min = Math.ceil(min);
@@ -15,10 +18,17 @@ if(rndNum === exclude){
 }
 }
 
-const StartGameScreen = props => {
+const renderListItem = (value , index) =>(
+    <View key={index} style={styles.listItem}>
+    <BodyText># {index}</BodyText>
+    <BodyText>{value}</BodyText>
+</View>
+)
 
-const [currentGuess , setCurrentGuess] = useState(generateNumberBetween(1 , 99 , props.userChoice))
-const [rounds , setRounds] = useState(0)
+const StartGameScreen = props => {
+const initialGuess = generateNumberBetween(1 , 99 , props.userChoice);
+const [currentGuess , setCurrentGuess] = useState(initialGuess)
+const [pastGuesses , setPastGuesses] = useState([initialGuess])
 
 const currentLow = useRef(1);
 const currentHeight = useRef(99);
@@ -28,7 +38,7 @@ const {userChoice , onGameOver } = props;
 useEffect(() =>{
     console.log("useEffect run");
     if(currentGuess === props.userChoice){
-      props.onGameOver(rounds);
+      props.onGameOver(pastGuesses.length);
     }
 },[currentGuess , userChoice , onGameOver]) // these are useEffect dependncy list useEffect will run if one of these depndency value has change if not of these valus are changed then useEffect will not run
 
@@ -42,11 +52,13 @@ const nextGuessHandler = direction =>{
         currentHeight.current = currentGuess;
     }
     else{
-        currentLow.current = currentGuess;
+        currentLow.current = currentGuess + 1 ;
     }
+    const nextNumber = generateNumberBetween(currentLow.current, currentHeight.current , currentGuess)
+    setCurrentGuess(nextNumber)
 
-    setCurrentGuess(generateNumberBetween(currentLow.current, currentHeight.current , currentGuess))
-    setRounds(curRounds => curRounds +1);
+   // setRounds(curRounds => curRounds +1);
+   setPastGuesses(curPastGuess => [nextNumber,...curPastGuess])
 }
 
 return(
@@ -54,9 +66,20 @@ return(
         <Text style={DefaultStyle.bodyText}>Opponent's Number</Text>
         <NumberContainer>{currentGuess}</NumberContainer>
         <Card style={styles.buttonContainer}>
-            <Button title="LOWER" onPress={nextGuessHandler.bind(this,'lower')}/>
-            <Button title="GREATER" onPress={nextGuessHandler.bind(this,'greater')}/>
+            <MainButton onPress={nextGuessHandler.bind(this,'lower')}>
+                <Ionicons name="md-remove" size={24} color='white'/>
+            </MainButton>
+            <MainButton onPress={nextGuessHandler.bind(this,'greater')}>
+            <Ionicons name="md-add" size={24} color='white'/>
+            </MainButton>
         </Card>
+        <View style={styles.listContainer}>
+        <ScrollView contentContainerStyle={styles.list}>
+            {pastGuesses.map((guess , index)=>(
+              renderListItem(guess, pastGuesses.length - index)
+            ))}
+        </ScrollView>
+        </View>
     </View>
 )
 }
@@ -73,6 +96,25 @@ const styles = StyleSheet.create({
     marginTop:20,
     width:300,
     maxWidth:'80%'
+    },
+    listItem:{
+        flexDirection:'row',
+        justifyContent:'space-between',
+        borderWidth:1,
+        padding:15,
+        marginVertical:10,
+        borderColor:'black',
+        width:"60%"
+
+    },
+    listContainer:{
+        width:'70%',
+        flex:1
+    },
+    list:{
+        flexGrow:1,
+        alignItems:'center',
+        justifyContent:'flex-end'
     }
 })
 
