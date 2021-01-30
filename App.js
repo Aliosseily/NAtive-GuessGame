@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet,  View , SafeAreaView} from 'react-native';
 import Header from './Components/Header'
 import StartGameScreen from './Components/screens/StartGameScreen'
 import GameScrenn from './Components/screens/GameScrenn'
@@ -62,10 +62,10 @@ else if(guessRounds > 0){
 }
 
   return (
-    <View style={styles.screen}>
+    <SafeAreaView style={styles.screen}>
       <Header >Guess a Number</Header>
       {content}
-    </View>
+    </SafeAreaView>
   );
 }
 
